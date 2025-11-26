@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { Menu, CircleUser } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { NavItems } from "./NavItems"
+import { logout } from "@/server/auth"
 
 export function Header() {
   return (
@@ -53,7 +56,12 @@ export function Header() {
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive">Logout</DropdownMenuItem>
+          <DropdownMenuItem 
+            className="text-destructive cursor-pointer"
+            onClick={() => logout()}
+          >
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
