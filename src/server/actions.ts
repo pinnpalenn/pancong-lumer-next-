@@ -104,3 +104,27 @@ export async function submitOrder(data: CreateOrderInput) {
     order_id: newOrder.id,
   };
 }
+
+export async function updateOrderStatus(orderId: string, newStatus: "PROCESSING" | "COMPLETED" | "CANCELLED") {
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: newStatus },
+    })
+    return { success: true }
+  } catch (error) {
+    return { success: false, message: "Gagal update status" }
+  }
+}
+
+export async function toggleProductAvailability(productId: number, isAvailable: boolean) {
+  try {
+    await prisma.product.update({
+      where: { id: productId },
+      data: { isAvailable },
+    })
+    return { success: true }
+  } catch (error) {
+    return { success: false, message: "Gagal update produk" }
+  }
+}

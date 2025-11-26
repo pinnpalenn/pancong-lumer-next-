@@ -77,3 +77,41 @@ export async function getDashboardStats() {
     menu_belum_laku: belumLaku,
   };
 }
+
+export async function getSalesChartData() {
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  const orders = await prisma.order.findMany({
+    where: {
+      createdAt: {
+        gte: sevenDaysAgo,
+      },
+      status: {
+        not: "CANCELLED",
+      },
+    },
+  })
+
+  // Grouping sales by date
+  const salesByDate: Record<string, number> = {}
+  
+  // Initialize last 7 days with 0
+  for (let i = 0; i < 7; i++) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const dateStr = d.toISOString().split("T")[0]
+    salesByDate[dateStr] = 0
+  }
+
+  orders.forEach(order => {
+    const dateStr = order.createdAt.toISOString().split("T")[0]
+    if (salesByDate[dateStr] !== undefined) {
+      salesByDate[dateStr] += Number(order.totalAmount)
+    }
+  })
+
+  return Object.entries(salesByDate)
+    .map(([name, total]) => ({ name, total }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+}

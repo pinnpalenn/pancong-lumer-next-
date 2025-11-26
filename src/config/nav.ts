@@ -8,22 +8,22 @@ export const navItems = [
   },
   {
     title: "Pesanan",
-    href: "/orders",
+    href: "/dashboard/orders",
     icon: ShoppingBag,
   },
   {
     title: "Menu",
-    href: "/products",
+    href: "/dashboard/products",
     icon: FileText,
   },
   {
     title: "Pelanggan",
-    href: "/customers",
+    href: "/dashboard/customers",
     icon: Users,
   },
   {
     title: "Pengaturan",
-    href: "/settings",
+    href: "/dashboard/settings",
     icon: Settings,
   },
 ]

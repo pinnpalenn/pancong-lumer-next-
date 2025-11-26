@@ -1,8 +1,8 @@
-import { getDashboardStats } from "@/server/data"
+import { getDashboardStats, getSalesChartData } from "@/server/data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { OverviewChart } from "@/components/dashboard/OverviewChart"
 import { DollarSign, ShoppingBag, TrendingUp, AlertCircle } from "lucide-react"
 
-// Format Rupiah Helper
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -12,8 +12,8 @@ const formatRupiah = (number: number) => {
 }
 
 export default async function DashboardPage() {
-  // 1. Ambil data langsung dari database (Server Component)
   const stats = await getDashboardStats()
+  const chartData = await getSalesChartData()
 
   return (
     <div className="flex flex-col gap-4">
@@ -24,7 +24,6 @@ export default async function DashboardPage() {
         </span>
       </div>
 
-      {/* --- STATS CARDS --- */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -51,10 +50,19 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* --- MENU PERFORMANCE --- */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Menu Laku */}
+        {/* CHART SECTION */}
         <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Grafik Penjualan (7 Hari Terakhir)</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <OverviewChart data={chartData} />
+          </CardContent>
+        </Card>
+
+        {/* MENU PERFORMANCE (Dari kode Anda sebelumnya) */}
+        <Card className="col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-green-500" />
@@ -66,38 +74,26 @@ export default async function DashboardPage() {
               {stats.menu_laku.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Belum ada data penjualan.</p>
               ) : (
-                stats.menu_laku.map((item: any, i: number) => (
+                stats.menu_laku.slice(0, 5).map((item: any, i: number) => (
                   <div key={i} className="flex items-center justify-between border-b pb-2 last:border-0">
-                    <div className="font-medium">{item.nama}</div>
-                    <div className="text-sm text-muted-foreground">{item.jumlah} terjual</div>
+                    <div className="font-medium text-sm">{item.nama}</div>
+                    <div className="text-sm text-primary font-bold">{item.jumlah} terjual</div>
                   </div>
                 ))
               )}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Menu Belum Laku (Evaluasi) */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              Perlu Evaluasi
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground mb-2">Menu belum terjual hari ini:</p>
-              <div className="flex flex-wrap gap-2">
-                {stats.menu_belum_laku.map((item: any, i: number) => (
-                  <span 
-                    key={i} 
-                    className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10"
-                  >
-                    {item.nama}
-                  </span>
-                ))}
-              </div>
+            
+            <div className="mt-6">
+                <h4 className="text-sm font-semibold mb-2 flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-4 w-4" /> Perlu Evaluasi
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                    {stats.menu_belum_laku.slice(0, 6).map((item: any, i: number) => (
+                    <span key={i} className="text-[10px] bg-muted px-2 py-1 rounded-full">
+                        {item.nama}
+                    </span>
+                    ))}
+                </div>
             </div>
           </CardContent>
         </Card>
