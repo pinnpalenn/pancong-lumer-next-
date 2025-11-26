@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("PRISMA_DATABASE_URL") 
+  directUrl = env("POSTGRES_URL")
+}
+
+model Admin {
+  id String @id @default(cuid())
+  username String @unique
+  password String
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String @unique
+  price Decimal
+  image String?
+  isAvailable Boolean @default(true)
+  orderItems OrderItem[]
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id String @id @default(cuid())
+  customerName String?
+  totalAmount Decimal
+  status OrderStatus @default(PENDING)
+  paymentMethod PaymentMethod
+  deliveryMethod DeliveryMethod
+  createdAt DateTime @default(now())
+  items OrderItem[]
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+  orderId String
+  productId Int
+  quantity Int
+  priceAtTime Decimal
+  order Order @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  QRIS
+  TRANSFER
+}
+
+enum DeliveryMethod {
+  DINE_IN
+  TAKE_AWAY
+  DELIVERY
+}
